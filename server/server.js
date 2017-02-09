@@ -19,8 +19,17 @@ app.post('/todos', (req, res) => {
   todo.save().then((doc) => {
       res.send(doc);
   }, (e) => {
-      res.status(400).json(e);
+      res.status(400).send(e);
   });
+});
+
+app.get('/todos', (req, res) => {
+  Todo.find().then((todos) => {
+    // pass the todos array as an object to, easily add properties later
+    res.send({todos})
+  },(e) => {
+    res.status(400).send(e);
+  })
 });
 
 app.listen(3000, () => {
