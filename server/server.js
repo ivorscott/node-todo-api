@@ -1,12 +1,11 @@
-// pull the mongoose property off the object
-const {ObjectID} = require('mongodb'),
-      {mongoose} = require('./db/mongoose'),
-      {Todo} = require('./models/todo'),
-      {User} = require('./models/user'),
+require('./config/config')
+const _ = require('lodash'),
       express = require('express'),
       bodyParser = require('body-parser'),
-      _ = require('lodash'),
-      port = process.env.PORT || 3000
+      {ObjectID} = require('mongodb'),
+      {mongoose} = require('./db/mongoose'),
+      {Todo} = require('./models/todo'),
+      {User} = require('./models/user')
 
 let = app = express()
 app.use(bodyParser.json())
@@ -72,6 +71,6 @@ app.patch('/todos/:id', (req,res) => {
   .catch((e) => res.status(400).send())
 })
 
-app.listen(port, () => console.log(`Started up at ${port}`))
+app.listen(process.env.PORT, () => console.log(`Started up at ${process.env.PORT}`))
 
 module.exports = {app}
