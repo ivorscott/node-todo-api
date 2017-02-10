@@ -5,6 +5,7 @@ const {ObjectID} = require('mongodb'),
       {User} = require('./models/user'),
       express = require('express'),
       bodyParser = require('body-parser'),
+      _ = require('lodash'),
       port = process.env.PORT || 3000
 
 let = app = express()
@@ -16,37 +17,61 @@ app.post('/todos', (req,res) => {
 
   todo.save().then((doc) => {
     res.send(doc)
-  },(e) => res.status(400).send(e))
+  },
+  (e) => res.status(400).send(e))
 })
 
 app.get('/todos', (req,res) => {
   Todo.find().then((todos) => {
     res.send({todos})
-  },(e) => res.status(400).send(e))
+  },
+  (e) => res.status(400).send(e))
 })
 
 app.get('/todos/:id', (req,res) => {
   let id = req.params.id
-  if(!ObjectID.isValid(id)) return res.status(404).send()
+
+  if (!ObjectID.isValid(id)) return res.status(404).send()
 
   Todo.findById(id).then((todo) => {
-    if(!todo) return res.status(404).send()
+    if (!todo) return res.status(404).send()
     res.send({todo})
-  }).catch((e) => res.status(400).send())
+  })
+  .catch((e) => res.status(400).send())
 })
 
 app.delete('/todos/:id', (req,res) => {
   let id = req.params.id
-  if(!ObjectID.isValid(id)) return res.status(404).send()
+
+  if (!ObjectID.isValid(id)) return res.status(404).send()
 
   Todo.findByIdAndRemove(id).then((todo) => {
-    if(!todo) return res.status(404).send()
+    if (!todo) return res.status(404).send()
     res.send({todo})
-  }).catch((e) => res.status(400).send())
+  })
+  .catch((e) => res.status(400).send())
 })
 
-app.listen(port, () => {
-  console.log(`Started up at ${port}`)
+app.patch('/todos/:id', (req,res) => {
+  let id = req.params.id
+  body = _.pick(req.body, ['text','completed'])
+
+  if (!ObjectID.isValid(id)) return res.status(404).send()
+
+  if (_.isBoolean(body.completed) && body.completed ){
+     body.completedAt = new Date().getTime()
+  } else {
+    body.completed = false
+    body.completedAt - null
+  }
+
+  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+    if (!todo) return res.status(404).send()
+    res.send({todo})
+  })
+  .catch((e) => res.status(400).send())
 })
+
+app.listen(port, () => console.log(`Started up at ${port}`))
 
 module.exports = {app}
