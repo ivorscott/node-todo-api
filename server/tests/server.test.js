@@ -12,7 +12,6 @@ const expect = require('expect'),
       }]
 
 beforeEach((done) => {
-  // async delete the database before each test and use seed data
   Todo.remove({}).then(() => {
     return Todo.insertMany(todos);
   }).then(() => done())
@@ -21,7 +20,6 @@ beforeEach((done) => {
 describe('POST /todos', () => {
   it('should create a new todo', (done) => {
     let text = 'Test todo text'
-
     request(app)
       .post('/todos')
       .send({text})
@@ -48,10 +46,7 @@ describe('POST /todos', () => {
       .send({})
       .expect(400)
       .end((err, res) => {
-        if(err) {
-          return done(err)
-        }
-
+        if(err) return done(err)
         Todo.find().then((todos) => {
           expect(todos.length).toBe(2)
           done()
@@ -67,8 +62,7 @@ describe('GET /todos', () => {
       .expect(200)
       .expect((res) => {
         expect(res.body.todos.length).toBe(2)
-      })
-      .end(done)
+      }).end(done)
   })
 })
 
@@ -79,8 +73,7 @@ describe('GET /todos/:id', () => {
       .expect(200)
       .expect((res) => {
         expect(res.body.todo.text).toBe(todos[0].text)
-      })
-      .end(done)
+      }).end(done)
   })
 
   it('should return 404 if todo not found', (done) => {
@@ -94,6 +87,40 @@ describe('GET /todos/:id', () => {
   it('should return 404 for non-object ids', (done) => {
     request(app)
       .get(`/todos/asdf`)
+      .expect(404)
+      .end(done)
+  })
+})
+
+describe('DELETE /todos/:id', () => {
+  it('should remove a todo', (done) => {
+    let id = todos[1]._id.toHexString();
+    request(app)
+      .delete(`/todos/${id}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo._id).toBe(id)
+      })
+      .end((err,res) => {
+        if(err) return done(err)
+        Todo.findById(id).then((todo) => {
+          expect(todo).toNotExist()
+          done()
+        }).catch((e)=> done(e))
+      })
+  })
+
+  it('should return 404 if todo not found', (done) => {
+    let id = new ObjectID().toHexString();
+    request(app)
+      .delete(`/todos/${id}`)
+      .expect(404)
+      .end(done)
+  })
+
+  it('should return 404 for non-object ids', (done) => {
+    request(app)
+      .delete(`/todos/asdf`)
       .expect(404)
       .end(done)
   })
