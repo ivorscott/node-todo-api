@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 let Todo = mongoose.model('Todo', {
   text: {
@@ -15,6 +15,6 @@ let Todo = mongoose.model('Todo', {
     type: Number,
     default: null
   }
-});
+})
 
-module.exports = {Todo};
+module.exports = {Todo}

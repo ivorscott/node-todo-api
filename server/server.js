@@ -10,6 +10,15 @@ const _ = require('lodash'),
 let = app = express()
 app.use(bodyParser.json())
 
+app.post('/users', (req,res) => {
+  let body = _.pick(req.body, ['email','password'])
+  let user = new User(body)
+
+  user.save().then((doc) => {
+    res.send(doc)
+  }).catch((e) => res.status(400).send(e))
+});
+
 app.post('/todos', (req,res) => {
   let text = req.body.text,
       todo = new Todo({text})
