@@ -5,8 +5,9 @@ const {ObjectID} = require('mongodb'),
       {User} = require('./models/user'),
       express = require('express'),
       bodyParser = require('body-parser'),
-      app = express();
+      port = process.env.PORT || 3000
 
+let = app = express()
 app.use(bodyParser.json())
 
 app.post('/todos', (req, res) => {
@@ -34,8 +35,8 @@ app.get('/todos/:id', (req, res) => {
   }).catch((e) => res.status(400).send())
 })
 
-app.listen(3000, () => {
-  console.log('Shared on port 3000')
+app.listen(port, () => {
+  console.log(`Started up at ${port}`)
 })
 
 module.exports = {app}
