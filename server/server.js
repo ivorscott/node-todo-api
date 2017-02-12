@@ -2,6 +2,7 @@ require('./config/config')
 const _ = require('lodash'),
       express = require('express'),
       bodyParser = require('body-parser'),
+      {authenticate} = require('./middleware/authenticate'),
       {ObjectID} = require('mongodb'),
       {mongoose} = require('./db/mongoose'),
       {Todo} = require('./models/todo'),
@@ -9,6 +10,10 @@ const _ = require('lodash'),
 
 let = app = express()
 app.use(bodyParser.json())
+
+app.get('/users/me', authenticate, (req,res) => {
+  res.send(req.user)
+})
 
 app.post('/users', (req,res) => {
   let body = _.pick(req.body, ['email','password'])
