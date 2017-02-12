@@ -1,4 +1,4 @@
-const mongoose = require('mongoose'),
+const { mongoose } = require('./../db/mongoose'),
       validator = require('validator'),
       jwt = require('jsonwebtoken'),
       _ = require('lodash'),
@@ -81,4 +81,4 @@ UserSchema.pre('save', function(next) {
 
 let User = mongoose.model('User', UserSchema)
 
-module.exports = {User}
+module.exports = { User }
