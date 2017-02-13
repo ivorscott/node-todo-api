@@ -35,18 +35,20 @@ let UserSchema = new Schema({
 })
 
 UserSchema.methods.toJSON = function() {
-  let user = this,
-      userObject = user.toObject()
+  let User = this,
+      userObject = User.toObject()
   return _.pick(userObject, ['_id','email'])
 }
 
-UserSchema.methods.createUser = function() {
-  let user = this,
+UserSchema.methods.generateAuthToken = function() {
+  let User = this,
       access = 'auth',
-      token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString()
-  user.tokens.push({access, token})
-  return user.save().then(() => token)
+      token = jwt.sign({_id: User._id.toHexString(), access}, 'abc123').toString()
+  User.tokens.push({access, token})
+  return User.save().then(() => token)
 }
+
+UserSchema.methods.createUser = UserSchema.methods.generateAuthToken
 
 UserSchema.statics.findbyToken = function(token){
   var User = this,
@@ -64,13 +66,29 @@ UserSchema.statics.findbyToken = function(token){
   })
 }
 
-UserSchema.pre('save', function(next) {
-  let user = this
+UserSchema.statics.findByCredentials = function(email, password) {
+  let User = this
+  return User.findOne({email}).then((user) => {
+    if(!user) return Promise.reject()
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(password, user.password, (err, res) => {
+        if(res) {
+          resolve(user)
+        } else {
+          reject()
+        }
+      })
+    })
+  })
+}
 
-  if(user.isModified('password')) {
+UserSchema.pre('save', function(next) {
+  let User = this
+
+  if(User.isModified('password')) {
     bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(user.password, salt, (err, hash) => {
-        user.password = hash
+      bcrypt.hash(User.password, salt, (err, hash) => {
+        User.password = hash
         next()
       })
     })
