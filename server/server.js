@@ -12,10 +12,13 @@ const _ = require('lodash'),
 let = app = express()
 
 let corsOptions = {
+  origin: true,
   exposedHeaders: 'x-auth';
 }
 
-app.use(cors())
+app.options('*', cors())
+app.use(cors(corsOptions))
+
 app.use(bodyParser.json())
 
 app.post('/users/login', (req,res) => {
