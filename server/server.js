@@ -1,6 +1,7 @@
 require('./config/config')
 const _ = require('lodash'),
       express = require('express'),
+      cors = require('cors'),
       bodyParser = require('body-parser'),
       { authenticate } = require('./middleware/authenticate'),
       { ObjectID } = require('mongodb'),
@@ -10,6 +11,7 @@ const _ = require('lodash'),
 
 let = app = express()
 
+app.use(cors())
 app.use(bodyParser.json())
 
 app.post('/users/login', (req,res) => {
