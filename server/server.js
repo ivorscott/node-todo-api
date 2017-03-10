@@ -11,13 +11,9 @@ const _ = require('lodash'),
 
 let = app = express()
 
-let corsOptions = {
-  origin: true,
-  exposedHeaders: 'x-auth';
-}
+let corsOptions = { exposedHeaders: 'x-auth'; }
 
-app.options('*', cors())
-app.use(cors(corsOptions))
+app.options('*', cors(corOptions))
 
 app.use(bodyParser.json())
 
