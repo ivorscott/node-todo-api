@@ -13,7 +13,7 @@ let UserSchema = new Schema({
     minlength: 1,
     unique: true,
     validate: {
-      validator: validator.isEmail,
+      validator: (value) => validator.isEmail,
       message: '{VALUE} is not a valid email'
     }
   },

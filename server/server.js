@@ -11,9 +11,9 @@ const _ = require('lodash'),
 
 let = app = express()
 
-let corsOptions = { exposedHeaders: 'x-auth'; }
+let corsOptions = { exposedHeaders: 'x-auth' }
 
-app.options('*', cors(corOptions))
+app.options('*', cors(corsOptions))
 
 app.use(bodyParser.json())
 
@@ -123,6 +123,9 @@ app.patch('/todos/:id', authenticate, (req,res) => {
   .catch((e) => res.status(400).send())
 })
 
-app.listen(process.env.PORT, () => console.log(`Started up at ${process.env.PORT}`))
+if(!module.parent) {
+  app.listen(process.env.PORT, () => console.log(`
+    NODE_ENV ${process.env.NODE_ENV} Started up at ${process.env.PORT}`))
+}
 
 module.exports = { app }

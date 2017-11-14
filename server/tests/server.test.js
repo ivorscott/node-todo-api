@@ -1,6 +1,6 @@
 const expect = require('expect'),
-      request = require('supertest'),
       { app } = require('./../server'),
+      request = require('supertest'),
       { ObjectID } = require('mongodb'),
       { Todo } = require('./../models/todo'),
       { User } = require('./../models/user'),
