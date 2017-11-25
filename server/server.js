@@ -10,13 +10,13 @@ const _ = require('lodash'),
       { Todo } = require('./models/todo'),
       { User } = require('./models/user')
 
-let = app = express()
+let = app = express(),
+      headers = ['x-auth'],
+      corsOptions = { exposedHeaders: headers }
 
-let corsOptions = { exposedHeaders: 'X-Auth' }
-
-app.options('*', cors(corsOptions))
-
-app.use(bodyParser.json())
+app.options('*', cors()) // enable pre-flight request
+app.use(cors(corsOptions)) // enable all cors requests
+app.use(bodyParser.json()) // enable json parsing
 
 app.post('/users/login', (req,res) => {
   let body = _.pick(req.body, ['email','password'])
@@ -28,7 +28,7 @@ app.post('/users/login', (req,res) => {
     }).serialize(user);
 
     return user.generateAuthToken().then((token) => {
-      res.header('X-Auth',token).send(json)
+      res.header(headers[0], token).send(json)
     })
   })
   .catch((e) => res.status(400).send(e))
@@ -82,7 +82,7 @@ app.get('/users/:id', authenticate, (req,res) => {
   })
   .catch((e) => res.status(400).send(e))
 })
-app.post('/users', (req,res) => {
+app.post('/users', (req, res) => {
   let body = _.pick(req.body, ['email','password','firstName','lastName'])
   let user = new User(body)
   let json = new JSONAPISerializer('users', {
@@ -90,7 +90,7 @@ app.post('/users', (req,res) => {
   }).serialize(user);
 
   user.generateAuthToken().then((token) => {
-    res.header('X-Auth',token).send(json)
+    res.header(headers[0], token).send(json)
   })
   .catch((e) => res.status(400).send(e))
 });
@@ -174,4 +174,4 @@ if(!module.parent) {
     NODE_ENV ${process.env.NODE_ENV} Started up at ${process.env.PORT}`))
 }
 
-module.exports = { app }
+module.exports = { app, headers }
