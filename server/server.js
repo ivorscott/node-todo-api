@@ -3,6 +3,7 @@ const _ = require('lodash'),
       express = require('express'),
       cors = require('cors'),
       bodyParser = require('body-parser'),
+      JSONAPISerializer = require('jsonapi-serializer').Serializer,
       { authenticate } = require('./middleware/authenticate'),
       { ObjectID } = require('mongodb'),
       { mongoose } = require('./db/mongoose'),
@@ -11,7 +12,7 @@ const _ = require('lodash'),
 
 let = app = express()
 
-let corsOptions = { exposedHeaders: 'x-auth' }
+let corsOptions = { exposedHeaders: 'X-Auth' }
 
 app.options('*', cors(corsOptions))
 
@@ -21,32 +22,77 @@ app.post('/users/login', (req,res) => {
   let body = _.pick(req.body, ['email','password'])
 
   User.findByCredentials(body.email, body.password).then((user) => {
+
+    let json = new JSONAPISerializer('users', {
+      attributes: User.attributes()
+    }).serialize(user);
+
     return user.generateAuthToken().then((token) => {
-      res.header('x-auth',token).send(user)
+      res.header('X-Auth',token).send(json)
     })
   })
-  .catch((e) => res.status(400).send())
+  .catch((e) => res.status(400).send(e))
 })
 
-app.delete('/users/me/token', authenticate, (req,res) => {
+app.delete('/users/:id/token', authenticate, (req,res) => {
+  let _id = req.params.id
+
+  if(!ObjectID.isValid(_id)) return res.status(404).send()
+  if(req.user._id.toHexString() !== _id) return res.status(400).send()
+
   req.user.removeToken(req.token).then(() => {
     res.status(200).send()
   })
-  .catch((e) => res.status(400).send())
+  .catch((e) => res.status(400).send(e))
 })
 
-app.get('/users/me', authenticate, (req,res) => {
-  res.send(req.user)
+app.patch('/users/:id', authenticate, (req,res) => {
+  let id = req.params.id,
+  body = _.pick(req.body, ['firstName', 'lastName', 'email'])
+
+  if(!ObjectID.isValid(id)) return res.status(404).send()
+  if(req.user._id.toHexString() !== id) return res.status(400).send()
+
+  User.findOneAndUpdate({
+    _id: id,
+  }, {$set: body}, {new: true}).then((user) => {
+    if(!user) return res.status(404).send()
+
+    let json = new JSONAPISerializer('users', {
+      attributes: User.attributes()
+    }).serialize(user);
+
+    res.send(json)
+  })
+  .catch((e) => res.status(400).send(e))
 })
 
+app.get('/users/:id', authenticate, (req,res) => {
+  let _id = req.params.id
+
+  if(!ObjectID.isValid(_id)) return res.status(404).send()
+
+  User.findOne({ _id })
+  .then((user) => {
+    if(!user) return res.status(404).send()
+    let json = new JSONAPISerializer('users', {
+      attributes: User.attributes()
+    }).serialize(user);
+    res.send(json)
+  })
+  .catch((e) => res.status(400).send(e))
+})
 app.post('/users', (req,res) => {
-  let body = _.pick(req.body, ['email','password'])
+  let body = _.pick(req.body, ['email','password','firstName','lastName'])
   let user = new User(body)
+  let json = new JSONAPISerializer('users', {
+    attributes: User.attributes()
+  }).serialize(user);
 
   user.generateAuthToken().then((token) => {
-    res.header('x-auth',token).send(user)
+    res.header('X-Auth',token).send(json)
   })
-  .catch((e) => res.status(400).send())
+  .catch((e) => res.status(400).send(e))
 });
 
 app.post('/todos', authenticate, (req,res) => {
@@ -82,7 +128,7 @@ app.get('/todos/:id', authenticate, (req,res) => {
     if(!todo) return res.status(404).send()
     res.send({todo})
   })
-  .catch((e) => res.status(400).send())
+  .catch((e) => res.status(400).send(e))
 })
 
 app.delete('/todos/:id', authenticate, (req,res) => {
@@ -97,12 +143,12 @@ app.delete('/todos/:id', authenticate, (req,res) => {
     if(!todo) return res.status(404).send()
     res.send({todo})
   })
-  .catch((e) => res.status(400).send())
+  .catch((e) => res.status(400).send(e))
 })
 
 app.patch('/todos/:id', authenticate, (req,res) => {
-  let id = req.params.id
-  body = _.pick(req.body, ['text','completed'])
+  let id = req.params.id,
+      body = _.pick(req.body, ['text','completed'])
 
   if(!ObjectID.isValid(id)) return res.status(404).send()
 
@@ -120,7 +166,7 @@ app.patch('/todos/:id', authenticate, (req,res) => {
     if(!todo) return res.status(404).send()
     res.send({todo})
   })
-  .catch((e) => res.status(400).send())
+  .catch((e) => res.status(400).send(e))
 })
 
 if(!module.parent) {

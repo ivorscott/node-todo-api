@@ -7,6 +7,8 @@ const {ObjectID} = require('mongodb'),
 
 const users = [{
   _id: userOneId,
+  firstName: 'Ivor',
+  lastName: 'Cummings',
   email: 'test@email.com',
   password: 'userOnePass',
   tokens: [{
@@ -15,6 +17,8 @@ const users = [{
   }]
 }, {
   _id: userTwoId,
+  firstName: 'Tyler',
+  lastName: 'Cummings',
   email: 'test2@gmail.com',
   password: 'userTwoPass',
   tokens: [{

@@ -220,22 +220,22 @@ describe('PATCH /todos/:id', () => {
   })
 })
 
-describe('GET /users/me', () => {
+describe('GET /users/:id', () => {
   it('should return user if authenticated', (done) => {
     request(app)
-      .get('/users/me')
+      .get(`/users/${users[0]._id.toHexString()}`)
       .set('x-auth', users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
-        expect(res.body._id).toBe(users[0]._id.toHexString())
-        expect(res.body.email).toBe(users[0].email)
+        expect(res.body.user._id).toBe(users[0]._id.toHexString())
+        expect(res.body.user.email).toBe(users[0].email)
       })
       .end(done)
   })
 
   it('should return 401 if not authenticated', (done) => {
     request(app)
-      .get('/users/me')
+      .get(`/users/${users[0]._id.toHexString()}`)
       .set('x-auth', '')
       .expect(401)
       .expect((res) => {
@@ -247,17 +247,21 @@ describe('GET /users/me', () => {
 
 describe('POST /users', () => {
   it('should create a user', (done) => {
-    let email = 'example@example.com',
-        password = '123123'
+    let email = 'test@test.com',
+        password = '123123',
+        firstName = 'Julian',
+        lastName = users[0].lastName
 
     request(app)
       .post('/users')
-      .send({email, password})
+      .send({email, password, firstName, lastName})
       .expect(200)
       .expect((res) => {
         expect(res.headers['x-auth']).toExist()
         expect(res.body._id).toExist()
         expect(res.body.email).toBe(email)
+        expect(res.body.firstName).toBe(firstName)
+        expect(res.body.lastName).toBe(lastName)
       })
       .end((err) => {
         if(err) return done(err)
@@ -270,10 +274,34 @@ describe('POST /users', () => {
       })
   })
 
-  it('should return validation errors if request invalid', (done) => {
+  it('should return validation error if email is invalid', (done) => {
     request(app)
       .post('/users')
-      .send({email:'abc', password:'123'})
+      .send({email:'abc'})
+      .expect(400)
+      .end(done)
+  })
+
+  it('should return validation error if password is invalid', (done) => {
+    request(app)
+      .post('/users')
+      .send({password:'123'})
+      .expect(400)
+      .end(done)
+  })
+
+  it('should return validation error if firstName is invalid', (done) => {
+    request(app)
+      .post('/users')
+      .send({firstName:''})
+      .expect(400)
+      .end(done)
+  })
+
+  it('should return validation error if lastName is invalid', (done) => {
+    request(app)
+      .post('/users')
+      .send({lastName:''})
       .expect(400)
       .end(done)
   })
@@ -334,10 +362,10 @@ describe('POST /users/login', () => {
   })
 })
 
-describe('DELETE /users/me/token', () => {
+describe('DELETE /users/:id/token', () => {
   it('should remove auth token on logout', (done) => {
     request(app)
-    .delete('/users/me/token')
+    .delete(`/users/${users[0]._id.toHexString()}/token`)
     .set('x-auth', users[0].tokens[0].token)
     .expect(200)
     .end((err, res) => {

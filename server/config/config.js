@@ -7,3 +7,7 @@ if(env === "development" || env === "test") {
     process.env[key] = envConfig[key]
   })
 }
+
+if(env === "development") {
+  process.env.NODE_ENV = "development"
+}

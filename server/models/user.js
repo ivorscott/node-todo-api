@@ -6,11 +6,25 @@ const { mongoose } = require('./../db/mongoose'),
       Schema = mongoose.Schema
 
 let UserSchema = new Schema({
-  email: {
+  firstName: {
     type: String,
     required: true,
     trim: true,
     minlength: 1,
+    maxlength: 47,
+  },
+  lastName: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 1,
+    maxlength: 47,
+  },
+  email: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 5,
     unique: true,
     validate: {
       validator: (value) => validator.isEmail,
@@ -34,10 +48,15 @@ let UserSchema = new Schema({
   }]
 })
 
+UserSchema.statics.attributes = function() {
+  return ['email', 'firstName', 'lastName']
+}
+
 UserSchema.methods.toJSON = function() {
   let User = this,
-      userObject = User.toObject()
-  return _.pick(userObject, ['_id','email'])
+      userObject = User.toObject(),
+      attributes = this.attributes()
+  return _.pick(userObject, attributes)
 }
 
 UserSchema.methods.generateAuthToken = function() {
