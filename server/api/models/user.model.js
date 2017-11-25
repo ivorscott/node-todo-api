@@ -1,9 +1,9 @@
-const { mongoose } = require('./../db/mongoose'),
+const mongoose = require('mongoose'),
+      { Schema } = mongoose,
       validator = require('validator'),
       jwt = require('jsonwebtoken'),
       _ = require('lodash'),
       bcrypt = require('bcryptjs'),
-      Schema = mongoose.Schema
 
 let UserSchema = new Schema({
   firstName: {
