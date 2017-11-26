@@ -1,3 +1,5 @@
+require('colour')
+
 // DATABASE CONNECTION
 //==============================================================================
 
@@ -7,11 +9,9 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // MONITOR CONNECTION EVENTS
 //==============================================================================
-// (.green), (.red) come from colour module
 
-require('colour')
 mongoose.connection.once('connected', () => {
-    console.log('Mongoose connected to '.green + process.env.MONGODB_URI)
+  console.log('Mongoose connected to '.green + process.env.MONGODB_URI)
 })
 mongoose.connection.on('error', err => {
   console.log('Mongoose connection error: '.red + process.env.MONGODB_URI)
@@ -51,5 +51,6 @@ process.on('SIGTERM', () => {
 
 // INITIALIZE MODELS
 //==============================================================================
+
 require('./models/user.model')
 require('./models/todo.model')

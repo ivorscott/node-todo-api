@@ -1,8 +1,8 @@
 const _ = require('lodash'),
-      mongoose = require('mongoose'),
       JSONAPISerializer = require('jsonapi-serializer').Serializer,
       { ObjectID } = require('mongodb'),
-      TodoModel = mongoose.model('Todo')
+      { Todo } = require('./../models/todo.model')
+
 module.exports.todosAddOne = (req, res) => {
   let todo = new Todo({
     text:req.body.text,
@@ -15,20 +15,15 @@ module.exports.todosAddOne = (req, res) => {
 }
 
 module.exports.todosGetOne = (req, res) => {
-
-}
-
-app.get('/todos', authenticate, (req,res) => {
-  // find todos where the creator is the authenticated user
   Todo.find({
     _creator: req.user._id
   }).then((todos) => {
     res.send({todos})
   },
   (e) => res.status(400).send(e))
-})
+}
 
-app.get('/todos/:id', authenticate, (req,res) => {
+module.exports.todosUpdateOne = (req, res) => {
   let id = req.params.id
 
   if(!ObjectID.isValid(id)) return res.status(404).send()
@@ -41,24 +36,9 @@ app.get('/todos/:id', authenticate, (req,res) => {
     res.send({todo})
   })
   .catch((e) => res.status(400).send(e))
-})
+}
 
-app.delete('/todos/:id', authenticate, (req,res) => {
-  let id = req.params.id
-
-  if(!ObjectID.isValid(id)) return res.status(404).send()
-
-  Todo.findOneAndRemove({
-    _id: id,
-    _creator: req.user._id
-  }).then((todo) => {
-    if(!todo) return res.status(404).send()
-    res.send({todo})
-  })
-  .catch((e) => res.status(400).send(e))
-})
-
-app.patch('/todos/:id', authenticate, (req,res) => {
+module.exports.todosUpdateOne = (req, res) => {
   let id = req.params.id,
       body = _.pick(req.body, ['text','completed'])
 
@@ -79,4 +59,20 @@ app.patch('/todos/:id', authenticate, (req,res) => {
     res.send({todo})
   })
   .catch((e) => res.status(400).send(e))
-})
+}
+
+
+module.exports.todosDeleteOne = (req, res) => {
+  let id = req.params.id
+
+  if(!ObjectID.isValid(id)) return res.status(404).send()
+
+  Todo.findOneAndRemove({
+    _id: id,
+    _creator: req.user._id
+  }).then((todo) => {
+    if(!todo) return res.status(404).send()
+    res.send({todo})
+  })
+  .catch((e) => res.status(400).send(e))
+}

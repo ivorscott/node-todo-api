@@ -1,10 +1,7 @@
-// USERS ROUTER
-//==============================================================================
-
 const express = require('express'),
       router = express.Router(),
       ctrlUsers = require('./../controllers/users.controller'),
-      authenticateUser = require('./../middleware/authenticate')
+      { authenticate } = require('./../middleware/authenticate')
 
 router
   .route('')
@@ -16,12 +13,12 @@ router
 
 router
   .route('/:id')
-  .all(authenticateUser)
+  .all(authenticate)
   .get(ctrlUsers.usersGetOne)
   .patch(ctrlUsers.usersUpdateOne)
 
 router
   .route('/:id/token')
-  .delete(authenticateUser, ctrlUsers.usersRemoveToken)
+  .delete(authenticate, ctrlUsers.usersRemoveToken)
 
 module.exports = router;

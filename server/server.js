@@ -1,9 +1,11 @@
 require('./config/environment')
 require('./api/database')
+require('colour')
 
 const routes = require('./api/router'),
       _ = require('lodash'),
       express = require('express'),
+      moment = require('moment'),
       cors = require('cors'),
       bodyParser = require('body-parser'),
       headers = ['x-auth'],
@@ -13,12 +15,22 @@ const routes = require('./api/router'),
 app.options('*', cors()) // enable pre-flight request
 app.use(cors(corsOptions)) // enable all cors requests
 app.use(bodyParser.json()) // enable json parsing
-
 app.use('/api/v1', routes);
 
 if(!module.parent) {
-  app.listen(process.env.PORT, () => console.log(`
-    NODE_ENV ${process.env.NODE_ENV} Started up at ${process.env.PORT}`))
+  app.listen(process.env.PORT, () => {
+    const name  = 'TodoAPI',
+          environment  = process.env.NODE_ENV,
+          host = process.env.HOST,
+          port = process.env.PORT
+    console.log(`
+    \t\t\t\t\t ${moment().format('LLL')}\n
+    ==============================================================\n
+    ${name.green} started up in a ${environment.green} environment\n
+    ==============================================================\n
+    ${host}:${port} (ready for clients)
+    \n`)
+  })
 }
 
 module.exports = { app, headers }

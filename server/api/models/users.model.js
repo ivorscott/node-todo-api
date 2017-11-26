@@ -3,9 +3,9 @@ const mongoose = require('mongoose'),
       validator = require('validator'),
       jwt = require('jsonwebtoken'),
       _ = require('lodash'),
-      bcrypt = require('bcryptjs'),
+      bcrypt = require('bcryptjs')
 
-let UserSchema = new Schema({
+const UserSchema = new Schema({
   firstName: {
     type: String,
     required: true,
@@ -124,6 +124,6 @@ UserSchema.pre('save', function(next) {
   }
 })
 
-let User = mongoose.model('User', UserSchema)
+const User = mongoose.model('User', UserSchema)
 
 module.exports = { User }

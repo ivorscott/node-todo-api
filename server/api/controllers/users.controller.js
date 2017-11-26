@@ -1,8 +1,7 @@
 const _ = require('lodash'),
-      mongoose = require('mongoose'),
       JSONAPISerializer = require('jsonapi-serializer').Serializer,
       { ObjectID } = require('mongodb'),
-      UserModel = mongoose.model('User')
+      { User } = require('./../models/user.model');
 
 module.exports.usersLogin = (req, res) => {
   let body = _.pick(req.body, ['email','password'])
