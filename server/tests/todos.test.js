@@ -1,9 +1,9 @@
 const expect = require('expect'),
-      { app, headers } = require('./../server'),
+      { app, headers, namespace } = require('./../server'),
       request = require('supertest'),
       { ObjectID } = require('mongodb'),
-      { Todo } = require('./../models/todo'),
-      { User } = require('./../models/user'),
+      { Todo } = require('./../api/models/todos.model'),
+      { User } = require('./../api/models/users.model'),
       { todos, users, populateTodos , populateUsers } = require('./seed/seed')
 
 beforeEach(populateUsers)
@@ -14,7 +14,7 @@ describe('POST /todos', () => {
     let text = 'Test todo text'
 
     request(app)
-      .post('/todos')
+      .post(`${namespace}/todos`)
       .set(headers[0], users[0].tokens[0].token)
       .send({text})
       .expect(200)
@@ -37,7 +37,7 @@ describe('POST /todos', () => {
 
   it('should not create todo with invalid body data', (done) => {
     request(app)
-      .post('/todos')
+      .post(`${namespace}/todos`)
       .set(headers[0], users[0].tokens[0].token)
       .send({})
       .expect(400)
@@ -55,7 +55,7 @@ describe('POST /todos', () => {
 describe('GET /todos', () => {
   it('should get all todos', (done) => {
     request(app)
-      .get('/todos')
+      .get(`${namespace}/todos`)
       .set(headers[0], users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
@@ -68,7 +68,7 @@ describe('GET /todos', () => {
 describe('GET /todos/:id', () => {
   it('should return todo doc', (done) => {
     request(app)
-      .get(`/todos/${todos[0]._id.toHexString()}`)
+      .get(`${namespace}/todos/${todos[0]._id.toHexString()}`)
       .set(headers[0], users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
@@ -79,7 +79,7 @@ describe('GET /todos/:id', () => {
 
   it('should not return todo doc created by other user', (done) => {
     request(app)
-      .get(`/todos/${todos[1]._id.toHexString()}`)
+      .get(`${namespace}/todos/${todos[1]._id.toHexString()}`)
       .set(headers[0],users[0].tokens[0].token)
       .expect(404)
       .end(done)
@@ -89,7 +89,7 @@ describe('GET /todos/:id', () => {
     let id = new ObjectID().toHexString();
 
     request(app)
-      .get(`/todos/${id}`)
+      .get(`${namespace}/todos/${id}`)
       .set(headers[0],users[0].tokens[0].token)
       .expect(404)
       .end(done)
@@ -97,7 +97,7 @@ describe('GET /todos/:id', () => {
 
   it('should return 404 for non-object ids', (done) => {
     request(app)
-      .get(`/todos/asdf`)
+      .get(`${namespace}/todos/asdf`)
       .set(headers[0],users[0].tokens[0].token)
       .expect(404)
       .end(done)
@@ -109,7 +109,7 @@ describe('DELETE /todos/:id', () => {
     let id = todos[1]._id.toHexString();
 
     request(app)
-      .delete(`/todos/${id}`)
+      .delete(`${namespace}/todos/${id}`)
       .set(headers[0],users[1].tokens[0].token)
       .expect(200)
       .expect((res) => {
@@ -130,7 +130,7 @@ describe('DELETE /todos/:id', () => {
     let id = todos[0]._id.toHexString();
 
     request(app)
-      .delete(`/todos/${id}`)
+      .delete(`${namespace}/todos/${id}`)
       .set(headers[0],users[1].tokens[0].token)
       .expect(404)
       .end((err,res) => {
@@ -148,7 +148,7 @@ describe('DELETE /todos/:id', () => {
     let id = new ObjectID().toHexString();
 
     request(app)
-      .delete(`/todos/${id}`)
+      .delete(`${namespace}/todos/${id}`)
       .set(headers[0],users[1].tokens[0].token)
       .expect(404)
       .end(done)
@@ -156,7 +156,7 @@ describe('DELETE /todos/:id', () => {
 
   it('should return 404 for non-object ids', (done) => {
     request(app)
-      .delete(`/todos/asdf`)
+      .delete(`${namespace}/todos/asdf`)
       .set(headers[0],users[1].tokens[0].token)
       .expect(404)
       .end(done)
@@ -169,7 +169,7 @@ describe('PATCH /todos/:id', () => {
         text = 'This should be the new text'
 
     request(app)
-      .patch(`/todos/${id}`)
+      .patch(`${namespace}/todos/${id}`)
       .set(headers[0],users[0].tokens[0].token)
       .send({
         completed: true,
@@ -189,7 +189,7 @@ describe('PATCH /todos/:id', () => {
         text = 'This should be the new text'
 
     request(app)
-      .patch(`/todos/${id}`)
+      .patch(`${namespace}/todos/${id}`)
       .set(headers[0],users[1].tokens[0].token)
       .send({
         completed: true,
@@ -204,7 +204,7 @@ describe('PATCH /todos/:id', () => {
         text = 'This should be the new text!!'
 
     request(app)
-      .patch(`/todos/${id}`)
+      .patch(`${namespace}/todos/${id}`)
       .set(headers[0],users[1].tokens[0].token)
       .send({
         completed: false,

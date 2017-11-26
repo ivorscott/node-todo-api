@@ -52,5 +52,5 @@ process.on('SIGTERM', () => {
 // INITIALIZE MODELS
 //==============================================================================
 
-require('./models/user.model')
-require('./models/todo.model')
+require('./models/users.model')
+require('./models/todos.model')

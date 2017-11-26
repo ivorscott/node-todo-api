@@ -1,6 +1,6 @@
-const {ObjectID} = require('mongodb'),
-      {Todo} = require('./../../models/todo'),
-      {User} = require('./../../models/user'),
+const { ObjectID } = require('mongodb'),
+      { Todo } = require('./../../api/models/todos.model'),
+      { User } = require('./../../api/models/users.model'),
       jwt = require('jsonwebtoken'),
       userOneId = new ObjectID(),
       userTwoId = new ObjectID()

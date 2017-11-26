@@ -10,12 +10,13 @@ const routes = require('./api/router'),
       bodyParser = require('body-parser'),
       headers = ['x-auth'],
       corsOptions = { exposedHeaders: headers },
+      namespace = '/api/v1',
       app = express()
 
 app.options('*', cors()) // enable pre-flight request
 app.use(cors(corsOptions)) // enable all cors requests
 app.use(bodyParser.json()) // enable json parsing
-app.use('/api/v1', routes);
+app.use(namespace, routes);
 
 if(!module.parent) {
   app.listen(process.env.PORT, () => {
@@ -28,9 +29,9 @@ if(!module.parent) {
     ==============================================================\n
     ${name.green} started up in a ${environment.green} environment\n
     ==============================================================\n
-    ${host}:${port} (ready for clients)
+    ${host}:${port}/${namespace} (ready for clients)
     \n`)
   })
 }
 
-module.exports = { app, headers }
+module.exports = { app, headers, namespace }

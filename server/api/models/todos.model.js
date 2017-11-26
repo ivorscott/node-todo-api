@@ -17,7 +17,7 @@ const TodoSchema = new Schema({
     default: null
   },
   _creator: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true
   }
 })

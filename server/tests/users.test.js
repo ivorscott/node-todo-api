@@ -1,9 +1,9 @@
 const expect = require('expect'),
-      { app, headers } = require('./../server'),
+      { app, headers, namespace } = require('./../server'),
       request = require('supertest'),
       { ObjectID } = require('mongodb'),
-      { Todo } = require('./../models/todo'),
-      { User } = require('./../models/user'),
+      { Todo } = require('./../api/models/todos.model'),
+      { User } = require('./../api/models/users.model'),
       { todos, users, populateTodos , populateUsers } = require('./seed/seed')
 
 beforeEach(populateUsers)
@@ -12,7 +12,7 @@ beforeEach(populateTodos)
 describe('GET /users/:id', () => {
   it('should return user if authenticated', (done) => {
     request(app)
-      .get(`/users/${users[0]._id.toHexString()}`)
+      .get(`${namespace}/users/${users[0]._id.toHexString()}`)
       .set(headers[0], users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
@@ -29,7 +29,7 @@ describe('GET /users/:id', () => {
 
   it('should return 401 if not authenticated', (done) => {
     request(app)
-      .get(`/users/${users[0]._id.toHexString()}`)
+      .get(`${namespace}/users/${users[0]._id.toHexString()}`)
       .set(headers[0], '')
       .expect(401)
       .expect((res) => {
@@ -47,7 +47,7 @@ describe('POST /users', () => {
         lastName = users[0].lastName
 
     request(app)
-      .post('/users')
+      .post(`${namespace}/users`)
       .send({email, password, firstName, lastName})
       .expect(200)
       .expect((res) => {
@@ -75,7 +75,7 @@ describe('POST /users', () => {
 
   it('should return validation error if email is invalid', (done) => {
     request(app)
-      .post('/users')
+      .post(`${namespace}/users`)
       .send({email:'abc'})
       .expect(400)
       .end(done)
@@ -83,7 +83,7 @@ describe('POST /users', () => {
 
   it('should return validation error if password is invalid', (done) => {
     request(app)
-      .post('/users')
+      .post(`${namespace}/users`)
       .send({password:'123'})
       .expect(400)
       .end(done)
@@ -91,7 +91,7 @@ describe('POST /users', () => {
 
   it('should return validation error if firstName is invalid', (done) => {
     request(app)
-      .post('/users')
+      .post(`${namespace}/users`)
       .send({firstName:''})
       .expect(400)
       .end(done)
@@ -99,7 +99,7 @@ describe('POST /users', () => {
 
   it('should return validation error if lastName is invalid', (done) => {
     request(app)
-      .post('/users')
+      .post(`${namespace}/users`)
       .send({lastName:''})
       .expect(400)
       .end(done)
@@ -107,7 +107,7 @@ describe('POST /users', () => {
 
   it('should not create user if email in use', (done) => {
     request(app)
-      .post('/users')
+      .post(`${namespace}/users`)
       .send({email: users[0].email, password:'abc123'})
       .expect(400)
       .end(done)
@@ -121,7 +121,7 @@ describe('PATCH /users/:id', () => {
           firstName= "Sammy"
 
       request(app)
-        .patch(`/users/${id}`)
+        .patch(`${namespace}/users/${id}`)
         .set(headers[0], users[0].tokens[0].token)
         .send({firstName})
         .expect(200)
@@ -142,7 +142,7 @@ describe('PATCH /users/:id', () => {
 describe('POST /users/login', () => {
   it('should login user and return auth token', (done) => {
     request(app)
-      .post('/users/login')
+      .post(`${namespace}/users/login`)
       .send({
         email: users[1].email,
         password: users[1].password
@@ -166,7 +166,7 @@ describe('POST /users/login', () => {
 
   it('should reject invalid login', (done) => {
     request(app)
-      .post('/users/login')
+      .post(`${namespace}/users/login`)
       .send({
         email: users[1].email,
         password: users[1].password + '1'
@@ -189,7 +189,7 @@ describe('POST /users/login', () => {
 describe('DELETE /users/:id/token', () => {
   it('should remove auth token on logout', (done) => {
     request(app)
-    .delete(`/users/${users[0]._id.toHexString()}/token`)
+    .delete(`${namespace}/users/${users[0]._id.toHexString()}/token`)
     .set(headers[0], users[0].tokens[0].token)
     .expect(200)
     .end((err, res) => {

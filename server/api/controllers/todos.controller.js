@@ -1,7 +1,7 @@
 const _ = require('lodash'),
       JSONAPISerializer = require('jsonapi-serializer').Serializer,
       { ObjectID } = require('mongodb'),
-      { Todo } = require('./../models/todo.model')
+      { Todo } = require('./../models/todos.model')
 
 module.exports.todosAddOne = (req, res) => {
   let todo = new Todo({

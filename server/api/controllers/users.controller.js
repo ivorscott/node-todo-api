@@ -1,7 +1,7 @@
 const _ = require('lodash'),
       JSONAPISerializer = require('jsonapi-serializer').Serializer,
       { ObjectID } = require('mongodb'),
-      { User } = require('./../models/user.model');
+      { User } = require('./../models/users.model');
 
 module.exports.usersLogin = (req, res) => {
   let body = _.pick(req.body, ['email','password'])
