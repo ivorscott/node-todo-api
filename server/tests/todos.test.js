@@ -19,7 +19,13 @@ describe('POST /todos', () => {
       .send({text})
       .expect(200)
       .expect((res)=> {
-        expect(res.body.text).toBe(text)
+        const {
+          data,
+          data: { attributes }
+        } = res.body
+
+        expect(data.type).toBe('todos')
+        expect(attributes.text).toBe(text)
       })
       .end((err, res) => {
         if(err) {
@@ -59,7 +65,11 @@ describe('GET /todos', () => {
       .set(headers[0], users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
-        expect(res.body.todos.length).toBe(1)
+        const {
+          data
+        } = res.body
+
+        expect(data.length).toBe(1)
       })
       .end(done)
   })
@@ -67,19 +77,29 @@ describe('GET /todos', () => {
 
 describe('GET /todos/:id', () => {
   it('should return todo doc', (done) => {
+    let id = todos[0]._id.toHexString()
     request(app)
-      .get(`${namespace}/todos/${todos[0]._id.toHexString()}`)
+      .get(`${namespace}/todos/${id}`)
       .set(headers[0], users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
-        expect(res.body.todo.text).toBe(todos[0].text)
+        const {
+          data,
+          data: { attributes }
+        } = res.body
+console.log(data)
+        expect(data.id).toBe(id)
+        expect(attributes.text).toBe(todos[0].text)
       })
       .end(done)
   })
 
   it('should not return todo doc created by other user', (done) => {
+
+    let id = todos[0]._id.toHexString()
+
     request(app)
-      .get(`${namespace}/todos/${todos[1]._id.toHexString()}`)
+      .get(`${namespace}/todos/${id}`)
       .set(headers[0],users[0].tokens[0].token)
       .expect(404)
       .end(done)
@@ -113,7 +133,12 @@ describe('DELETE /todos/:id', () => {
       .set(headers[0],users[1].tokens[0].token)
       .expect(200)
       .expect((res) => {
-        expect(res.body.todo._id).toBe(id)
+        const {
+          data,
+          data: { attributes }
+        } = res.body
+
+        expect(data.id).toBe(id)
       })
       .end((err,res) => {
         if(err) return done(err)
@@ -177,9 +202,14 @@ describe('PATCH /todos/:id', () => {
       })
       .expect(200)
       .expect((res) => {
-        expect(res.body.todo.text).toBe(text)
-        expect(res.body.todo.completed).toBe(true)
-        expect(res.body.todo.completedAt).toBeA('number')
+        const {
+          data,
+          data: { attributes }
+        } = res.body
+        expect(data.id).toBe(id)
+        expect(attributes.text).toBe(text)
+        expect(attributes.completed).toBe(true)
+        expect(attributes.completedAt).toBeA('number')
       })
       .end(done)
   })
@@ -212,9 +242,14 @@ describe('PATCH /todos/:id', () => {
       })
       .expect(200)
       .expect((res) => {
-        expect(res.body.todo.text).toBe(text)
-        expect(res.body.todo.completed).toBe(false)
-        expect(res.body.todo.completedAt).toNotExist()
+        const {
+          data,
+          data: { attributes }
+        } = res.body
+
+        expect(attributes.text).toBe(text)
+        expect(attributes.completed).toBe(false)
+        expect(attributes.completedAt).toNotExist()
       })
       .end(done)
   })

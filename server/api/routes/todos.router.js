@@ -5,7 +5,9 @@ const express = require('express'),
 
 router
   .route('')
+  .all(authenticate)
   .post(ctrlTodos.todosAddOne)
+  .get(ctrlTodos.todosGetAll)
 
 router
   .route('/:id')

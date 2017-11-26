@@ -16,14 +16,14 @@ const TodoSchema = new Schema({
     type: Number,
     default: null
   },
-  _creator: {
+  creator: {
     type: Schema.Types.ObjectId,
     required: true
   }
 })
 
 TodoSchema.statics.attributes = function() {
-  return ['text', 'completed', 'completedAt', '_creator']
+  return ['text', 'completed', 'completedAt', 'creator']
 }
 
 TodoSchema.methods.toJSON = function() {

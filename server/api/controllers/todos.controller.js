@@ -6,34 +6,62 @@ const _ = require('lodash'),
 module.exports.todosAddOne = (req, res) => {
   let todo = new Todo({
     text:req.body.text,
-    _creator: req.user._id
+    creator: req.user._id
   })
 
-  todo.save().then((doc) => {
-    res.send(doc)
+  todo.save().then((todo) => {
+    let json = new JSONAPISerializer('todos', {
+      attributes: Todo.attributes()
+    }).serialize(todo);
+
+    res.send(json)
   }).catch((e) => res.status(400).send(e))
 }
 
 module.exports.todosGetOne = (req, res) => {
   Todo.find({
-    _creator: req.user._id
+    creator: req.user._id
   }).then((todos) => {
-    res.send({todos})
+
+    let json = new JSONAPISerializer('todos', {
+      attributes: Todo.attributes()
+    }).serialize(todos);
+
+    res.send(json)
   },
   (e) => res.status(400).send(e))
 }
 
-module.exports.todosUpdateOne = (req, res) => {
+module.exports.todosGetAll = (req, res) => {
+  Todo.find({
+    creator: req.user._id
+  }).then((todos) => {
+
+    let json = new JSONAPISerializer('todos', {
+      attributes: Todo.attributes()
+    }).serialize(todos);
+
+    res.send(json)
+  },
+  (e) => res.status(400).send(e))
+}
+
+module.exports.todosGetOne = (req, res) => {
   let id = req.params.id
 
   if(!ObjectID.isValid(id)) return res.status(404).send()
 
   Todo.findOne({
     _id: id,
-    _creator: req.user._id
+    creator: req.user._id
   }).then((todo) => {
     if(!todo) return res.status(404).send()
-    res.send({todo})
+
+    let json = new JSONAPISerializer('todos', {
+      attributes: Todo.attributes()
+    }).serialize(todo);
+
+    res.send(json)
   })
   .catch((e) => res.status(400).send(e))
 }
@@ -53,14 +81,18 @@ module.exports.todosUpdateOne = (req, res) => {
 
   Todo.findOneAndUpdate({
     _id: id,
-    _creator: req.user._id
+    creator: req.user._id
   }, {$set: body}, {new: true}).then((todo) => {
     if(!todo) return res.status(404).send()
-    res.send({todo})
+
+    let json = new JSONAPISerializer('todos', {
+      attributes: Todo.attributes()
+    }).serialize(todo);
+
+    res.send(json)
   })
   .catch((e) => res.status(400).send(e))
 }
-
 
 module.exports.todosDeleteOne = (req, res) => {
   let id = req.params.id
@@ -69,10 +101,15 @@ module.exports.todosDeleteOne = (req, res) => {
 
   Todo.findOneAndRemove({
     _id: id,
-    _creator: req.user._id
+    creator: req.user._id
   }).then((todo) => {
     if(!todo) return res.status(404).send()
-    res.send({todo})
+
+    let json = new JSONAPISerializer('todos', {
+      attributes: Todo.attributes()
+    }).serialize(todo);
+
+    res.send(json)
   })
   .catch((e) => res.status(400).send(e))
 }
