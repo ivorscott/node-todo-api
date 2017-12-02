@@ -1,7 +1,7 @@
 const _ = require('lodash'),
       JSONAPISerializer = require('jsonapi-serializer').Serializer,
       { ObjectID } = require('mongodb'),
-      { User } = require('./../models/users.model');
+      { User } = require('./../models/users.model')
 
 module.exports.usersLogin = (req, res) => {
   let body = _.pick(req.body, ['email','password'])
@@ -13,7 +13,7 @@ module.exports.usersLogin = (req, res) => {
     }).serialize(user);
 
     return user.generateAuthToken().then((token) => {
-      res.header(headers[0], token).send(json)
+      res.header('x-auth', token).send(json)
     })
   })
   .catch((e) => res.status(400).send(e))
@@ -71,12 +71,12 @@ module.exports.usersGetOne = (req, res) => {
 module.exports.usersAddOne = (req, res) => {
   let body = _.pick(req.body, ['email','password','firstName','lastName'])
   let user = new User(body)
-  let json = new JSONAPISerializer('users', {
-    attributes: User.attributes()
-  }).serialize(user);
-
   user.generateAuthToken().then((token) => {
-    res.header(headers[0], token).send(json)
+    let json = new JSONAPISerializer('users', {
+      attributes: User.attributes()
+    }).serialize(user);
+    res.header('x-auth', token).send(json)
   })
   .catch((e) => res.status(400).send(e))
+
 }

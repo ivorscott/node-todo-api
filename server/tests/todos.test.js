@@ -1,5 +1,5 @@
 const expect = require('expect'),
-      { app, headers, namespace } = require('./../server'),
+      { app, namespace } = require('./../server'),
       request = require('supertest'),
       { ObjectID } = require('mongodb'),
       { Todo } = require('./../api/models/todos.model'),
@@ -15,7 +15,7 @@ describe('POST /todos', () => {
 
     request(app)
       .post(`${namespace}/todos`)
-      .set(headers[0], users[0].tokens[0].token)
+      .set('x-auth', users[0].tokens[0].token)
       .send({text})
       .expect(200)
       .expect((res)=> {
@@ -44,7 +44,7 @@ describe('POST /todos', () => {
   it('should not create todo with invalid body data', (done) => {
     request(app)
       .post(`${namespace}/todos`)
-      .set(headers[0], users[0].tokens[0].token)
+      .set('x-auth', users[0].tokens[0].token)
       .send({})
       .expect(400)
       .end((err, res) => {
@@ -62,7 +62,7 @@ describe('GET /todos', () => {
   it('should get all todos', (done) => {
     request(app)
       .get(`${namespace}/todos`)
-      .set(headers[0], users[0].tokens[0].token)
+      .set('x-auth', users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
         const {
@@ -80,14 +80,13 @@ describe('GET /todos/:id', () => {
     let id = todos[0]._id.toHexString()
     request(app)
       .get(`${namespace}/todos/${id}`)
-      .set(headers[0], users[0].tokens[0].token)
+      .set('x-auth', users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
         const {
           data,
           data: { attributes }
         } = res.body
-console.log(data)
         expect(data.id).toBe(id)
         expect(attributes.text).toBe(todos[0].text)
       })
@@ -95,12 +94,11 @@ console.log(data)
   })
 
   it('should not return todo doc created by other user', (done) => {
-
     let id = todos[0]._id.toHexString()
 
     request(app)
       .get(`${namespace}/todos/${id}`)
-      .set(headers[0],users[0].tokens[0].token)
+      .set('x-auth',users[1].tokens[0].token)
       .expect(404)
       .end(done)
   })
@@ -110,7 +108,7 @@ console.log(data)
 
     request(app)
       .get(`${namespace}/todos/${id}`)
-      .set(headers[0],users[0].tokens[0].token)
+      .set('x-auth',users[0].tokens[0].token)
       .expect(404)
       .end(done)
   })
@@ -118,7 +116,7 @@ console.log(data)
   it('should return 404 for non-object ids', (done) => {
     request(app)
       .get(`${namespace}/todos/asdf`)
-      .set(headers[0],users[0].tokens[0].token)
+      .set('x-auth',users[0].tokens[0].token)
       .expect(404)
       .end(done)
   })
@@ -130,7 +128,7 @@ describe('DELETE /todos/:id', () => {
 
     request(app)
       .delete(`${namespace}/todos/${id}`)
-      .set(headers[0],users[1].tokens[0].token)
+      .set('x-auth',users[1].tokens[0].token)
       .expect(200)
       .expect((res) => {
         const {
@@ -156,7 +154,7 @@ describe('DELETE /todos/:id', () => {
 
     request(app)
       .delete(`${namespace}/todos/${id}`)
-      .set(headers[0],users[1].tokens[0].token)
+      .set('x-auth',users[1].tokens[0].token)
       .expect(404)
       .end((err,res) => {
         if(err) return done(err)
@@ -174,7 +172,7 @@ describe('DELETE /todos/:id', () => {
 
     request(app)
       .delete(`${namespace}/todos/${id}`)
-      .set(headers[0],users[1].tokens[0].token)
+      .set('x-auth',users[1].tokens[0].token)
       .expect(404)
       .end(done)
   })
@@ -182,7 +180,7 @@ describe('DELETE /todos/:id', () => {
   it('should return 404 for non-object ids', (done) => {
     request(app)
       .delete(`${namespace}/todos/asdf`)
-      .set(headers[0],users[1].tokens[0].token)
+      .set('x-auth',users[1].tokens[0].token)
       .expect(404)
       .end(done)
   })
@@ -195,7 +193,7 @@ describe('PATCH /todos/:id', () => {
 
     request(app)
       .patch(`${namespace}/todos/${id}`)
-      .set(headers[0],users[0].tokens[0].token)
+      .set('x-auth',users[0].tokens[0].token)
       .send({
         completed: true,
         text
@@ -209,7 +207,7 @@ describe('PATCH /todos/:id', () => {
         expect(data.id).toBe(id)
         expect(attributes.text).toBe(text)
         expect(attributes.completed).toBe(true)
-        expect(attributes.completedAt).toBeA('number')
+        expect(attributes['completed-at']).toBeA('number')
       })
       .end(done)
   })
@@ -220,7 +218,7 @@ describe('PATCH /todos/:id', () => {
 
     request(app)
       .patch(`${namespace}/todos/${id}`)
-      .set(headers[0],users[1].tokens[0].token)
+      .set('x-auth',users[1].tokens[0].token)
       .send({
         completed: true,
         text
@@ -235,7 +233,7 @@ describe('PATCH /todos/:id', () => {
 
     request(app)
       .patch(`${namespace}/todos/${id}`)
-      .set(headers[0],users[1].tokens[0].token)
+      .set('x-auth',users[1].tokens[0].token)
       .send({
         completed: false,
         text

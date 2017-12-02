@@ -55,7 +55,7 @@ UserSchema.statics.attributes = function() {
 UserSchema.methods.toJSON = function() {
   let User = this,
       userObject = User.toObject(),
-      attributes = this.attributes()
+      attributes = UserSchema.statics.attributes
   return _.pick(userObject, attributes)
 }
 

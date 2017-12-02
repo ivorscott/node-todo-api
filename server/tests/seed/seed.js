@@ -9,7 +9,7 @@ const users = [{
   _id: userOneId,
   firstName: 'Ivor',
   lastName: 'Cummings',
-  email: 'test@email.com',
+  email: 'test@gmail.com',
   password: 'userOnePass',
   tokens: [{
     access: 'auth',

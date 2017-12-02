@@ -18,20 +18,6 @@ module.exports.todosAddOne = (req, res) => {
   }).catch((e) => res.status(400).send(e))
 }
 
-module.exports.todosGetOne = (req, res) => {
-  Todo.find({
-    creator: req.user._id
-  }).then((todos) => {
-
-    let json = new JSONAPISerializer('todos', {
-      attributes: Todo.attributes()
-    }).serialize(todos);
-
-    res.send(json)
-  },
-  (e) => res.status(400).send(e))
-}
-
 module.exports.todosGetAll = (req, res) => {
   Todo.find({
     creator: req.user._id

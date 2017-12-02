@@ -1,5 +1,5 @@
 const expect = require('expect'),
-      { app, headers, namespace } = require('./../server'),
+      { app, namespace } = require('./../server'),
       request = require('supertest'),
       { ObjectID } = require('mongodb'),
       { Todo } = require('./../api/models/todos.model'),
@@ -13,7 +13,7 @@ describe('GET /users/:id', () => {
   it('should return user if authenticated', (done) => {
     request(app)
       .get(`${namespace}/users/${users[0]._id.toHexString()}`)
-      .set(headers[0], users[0].tokens[0].token)
+      .set('x-auth', users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
         const {
@@ -30,7 +30,7 @@ describe('GET /users/:id', () => {
   it('should return 401 if not authenticated', (done) => {
     request(app)
       .get(`${namespace}/users/${users[0]._id.toHexString()}`)
-      .set(headers[0], '')
+      .set('x-auth', '')
       .expect(401)
       .expect((res) => {
         expect(res.body).toEqual({})
@@ -56,7 +56,7 @@ describe('POST /users', () => {
           data: { attributes }
         } = res.body
 
-        expect(res.headers[headers[0]]).toExist()
+        expect(res.headers['x-auth']).toExist()
         expect(data.id).toExist()
         expect(attributes['email']).toBe(email);
         expect(attributes['last-name']).toBe(lastName);
@@ -74,41 +74,66 @@ describe('POST /users', () => {
   })
 
   it('should return validation error if email is invalid', (done) => {
+    let email = 'test',
+        password = '123123',
+        firstName = 'Julian',
+        lastName = users[0].lastName
+
     request(app)
       .post(`${namespace}/users`)
-      .send({email:'abc'})
+      .send({ email, password, firstName, lastName })
       .expect(400)
       .end(done)
   })
 
   it('should return validation error if password is invalid', (done) => {
+    let email = 'test@test@gmail.com',
+        password = '123',
+        firstName = 'Julian',
+        lastName = users[0].lastName
+
     request(app)
       .post(`${namespace}/users`)
-      .send({password:'123'})
+      .send({ email, password, firstName, lastName })
       .expect(400)
       .end(done)
   })
 
   it('should return validation error if firstName is invalid', (done) => {
+    let email = 'test@test@gmail.com',
+        password = '123123',
+        firstName = '',
+        lastName = users[0].lastName
+
     request(app)
       .post(`${namespace}/users`)
-      .send({firstName:''})
+      .send({ email, password, firstName, lastName })
       .expect(400)
       .end(done)
   })
 
   it('should return validation error if lastName is invalid', (done) => {
+    let email = 'test@test@gmail.com',
+        password = '123123',
+        firstName = 'Julian',
+        lastName = ''
+
     request(app)
       .post(`${namespace}/users`)
-      .send({lastName:''})
+      .send({ email, password, firstName, lastName })
       .expect(400)
       .end(done)
   })
 
   it('should not create user if email in use', (done) => {
+    let email = users[0].email,
+        password = '123123',
+        firstName = 'Julian',
+        lastName = users[0].lastName
+
     request(app)
       .post(`${namespace}/users`)
-      .send({email: users[0].email, password:'abc123'})
+      .send({ email, password, firstName, lastName })
       .expect(400)
       .end(done)
   })
@@ -122,7 +147,7 @@ describe('PATCH /users/:id', () => {
 
       request(app)
         .patch(`${namespace}/users/${id}`)
-        .set(headers[0], users[0].tokens[0].token)
+        .set('x-auth', users[0].tokens[0].token)
         .send({firstName})
         .expect(200)
         .expect((res) => {
@@ -149,7 +174,7 @@ describe('POST /users/login', () => {
       })
       .expect(200)
       .expect((res) => {
-        expect(res.headers[headers[0]]).toExist()
+        expect(res.headers['x-auth']).toExist()
       })
       .end((err, res) => {
         if(err) return done(err)
@@ -157,7 +182,7 @@ describe('POST /users/login', () => {
         User.findById(users[1]._id).then((user) => {
           expect(user.tokens[1]).toInclude({
             access: 'auth',
-            token: res.headers[headers[0]]
+            token: res.headers['x-auth']
           })
           done()
         }).catch((e) => done(e))
@@ -173,7 +198,7 @@ describe('POST /users/login', () => {
       })
       .expect(400)
       .expect((res) => {
-        expect(res.headers[headers[0]]).toNotExist()
+        expect(res.headers['x-auth']).toNotExist()
       })
       .end((err, res) => {
         if(err) return done(err)
@@ -190,7 +215,7 @@ describe('DELETE /users/:id/token', () => {
   it('should remove auth token on logout', (done) => {
     request(app)
     .delete(`${namespace}/users/${users[0]._id.toHexString()}/token`)
-    .set(headers[0], users[0].tokens[0].token)
+    .set('x-auth', users[0].tokens[0].token)
     .expect(200)
     .end((err, res) => {
       if(err) return done(err)

@@ -29,7 +29,7 @@ TodoSchema.statics.attributes = function() {
 TodoSchema.methods.toJSON = function() {
   let Todo = this,
       todoObject = Todo.toObject(),
-      attributes = this.attributes()
+      attributes = TodoSchema.statics.attributes()
   return _.pick(todoObject, attributes)
 }
 
