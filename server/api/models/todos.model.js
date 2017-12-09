@@ -22,6 +22,10 @@ const TodoSchema = new Schema({
   }
 })
 
+TodoSchema.statics.type = function() {
+  return 'todos'
+}
+
 TodoSchema.statics.attributes = function() {
   return ['text', 'completed', 'completedAt', 'creator']
 }

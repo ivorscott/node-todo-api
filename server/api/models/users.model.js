@@ -48,6 +48,10 @@ const UserSchema = new Schema({
   }]
 })
 
+UserSchema.statics.type = function() {
+  return 'users'
+}
+
 UserSchema.statics.attributes = function() {
   return ['email', 'firstName', 'lastName']
 }

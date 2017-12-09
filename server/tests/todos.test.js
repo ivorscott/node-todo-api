@@ -15,8 +15,13 @@ describe('POST /todos', () => {
 
     request(app)
       .post(`${namespace}/todos`)
+      .set('content-type', 'application/vnd.api+json')
       .set('x-auth', users[0].tokens[0].token)
-      .send({text})
+      .send({
+        data: {
+      		attributes: { text }
+      	}
+      })
       .expect(200)
       .expect((res)=> {
         const {
@@ -44,6 +49,7 @@ describe('POST /todos', () => {
   it('should not create todo with invalid body data', (done) => {
     request(app)
       .post(`${namespace}/todos`)
+      .set('content-type', 'application/vnd.api+json')
       .set('x-auth', users[0].tokens[0].token)
       .send({})
       .expect(400)
@@ -193,10 +199,15 @@ describe('PATCH /todos/:id', () => {
 
     request(app)
       .patch(`${namespace}/todos/${id}`)
+      .set('content-type', 'application/vnd.api+json')
       .set('x-auth',users[0].tokens[0].token)
       .send({
-        completed: true,
-        text
+        data: {
+          attributes : {
+            completed: true,
+            text
+          }
+        }
       })
       .expect(200)
       .expect((res) => {
@@ -218,12 +229,17 @@ describe('PATCH /todos/:id', () => {
 
     request(app)
       .patch(`${namespace}/todos/${id}`)
+      .set('content-type', 'application/vnd.api+json')
       .set('x-auth',users[1].tokens[0].token)
       .send({
-        completed: true,
-        text
+        data: {
+          attributes: {
+            completed: true,
+            text
+          }
+        }
       })
-      .expect(404 )
+      .expect(404)
       .end(done)
   })
 
@@ -233,10 +249,15 @@ describe('PATCH /todos/:id', () => {
 
     request(app)
       .patch(`${namespace}/todos/${id}`)
+      .set('content-type', 'application/vnd.api+json')
       .set('x-auth',users[1].tokens[0].token)
       .send({
-        completed: false,
-        text
+        data: {
+          attributes: {
+            completed: false,
+            text
+          }
+        }
       })
       .expect(200)
       .expect((res) => {

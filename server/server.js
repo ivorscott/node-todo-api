@@ -17,11 +17,9 @@ const routes = require('./api/router'),
 app.options('*', cors()) // enable pre-flight request
 
 app.use(cors(corsOptions)) // enable all cors requests
-app.use(bodyParser.json()) // enable json parsing
+app.use(bodyParser.json({ type: 'application/vnd.api+json'})) // enable json parsing
 
-// Add middleware to console log every request
-app.use(logger);
-
+app.use(logger);// log every request
 app.use(namespace, routes);
 
 if(!module.parent) {
