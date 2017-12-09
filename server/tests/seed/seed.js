@@ -53,4 +53,12 @@ const populateUsers = (done) => {
   }).then(() => done())
 }
 
-module.exports = { todos, populateTodos, users, populateUsers }
+// Sample user attributes for POST & PATCH
+const sampleAttributes = {
+  'email': 'test@test.com',
+  'password': '123123',
+  'first-name': 'Julian',
+  'last-name': 'Cummings'
+}
+
+module.exports = { todos, populateTodos, users, populateUsers, sampleAttributes }

@@ -11,12 +11,12 @@ router
 
 router
   .route('/login')
-  .post(deserialize, ctrlUsers.usersLogin)
+  .post(deserialize, ctrlUsers.usersLogin, serialize)
 
 router
   .route('/:id')
   .all(authenticate)
-  .get(ctrlUsers.usersGetOne)
+  .get(ctrlUsers.usersGetOne, serialize)
   .patch(deserialize, ctrlUsers.usersUpdateOne, serialize)
 
 router

@@ -1,13 +1,12 @@
-const expect = require('expect'),
+const _ = require('lodash'),
+      expect = require('expect'),
       { app, namespace } = require('./../server'),
       request = require('supertest'),
       { ObjectID } = require('mongodb'),
-      { Todo } = require('./../api/models/todos.model'),
       { User } = require('./../api/models/users.model'),
-      { todos, users, populateTodos , populateUsers } = require('./seed/seed')
+      { users, populateUsers, sampleAttributes } = require('./seed/seed')
 
 beforeEach(populateUsers)
-beforeEach(populateTodos)
 
 describe('GET /users/:id', () => {
   it('should return user if authenticated', (done) => {
@@ -17,12 +16,11 @@ describe('GET /users/:id', () => {
       .expect(200)
       .expect((res) => {
         const {
-          data,
-          data: { attributes }
+          data
         } = res.body
 
         expect(data.id).toBe(users[0]._id.toHexString())
-        expect(attributes.email).toBe(users[0].email)
+        expect(data.attributes.email).toBe(users[0].email)
       })
       .end(done)
   })
@@ -41,39 +39,30 @@ describe('GET /users/:id', () => {
 
 describe('POST /users', () => {
   it('should create a user', (done) => {
-    let attributes = {
-      email: 'test@test.com',
-      password: '123123',
-      firstName: 'Julian',
-      lastName: users[0]['last-name']
-    }
+    let attributes = _.clone(sampleAttributes)
+    let { email, password } = attributes
 
     request(app)
       .post(`${namespace}/users`)
       .set('content-type', 'application/vnd.api+json')
       .send({
-        data: {
-          attributes
-        }
+        data: { attributes }
       })
       .expect(200)
       .expect((res) => {
         const {
-          data,
-          data: { attributes }
+          data
         } = res.body
 
         expect(res.headers['x-auth']).toExist()
         expect(data.id).toExist()
-        expect(attributes['email']).toBe(email);
-        expect(attributes['last-name']).toBe(lastName);
-        expect(attributes['first-name']).toBe(firstName);
+        expect(data.attributes.email).toBe(email);
+        expect(data.attributes['last-name']).toBe(attributes['last-name']);
+        expect(data.attributes['first-name']).toBe(attributes['first-name']);
       })
       .end((err) => {
         if(err) return done(err)
-
         User.findOne({email}).then((user) => {
-          expect(user).toExist()
           expect(user.password).toNotBe(password)
           done()
         }).catch((e) => done(e))
@@ -81,110 +70,103 @@ describe('POST /users', () => {
   })
 
   it('should return validation error if email is invalid', (done) => {
-    let email = 'test',
-        password = '123123',
-        firstName = 'Julian',
-        lastName = users[0]['last-name']
+    let attributes = _.clone(sampleAttributes)
+    attributes.email = '123'
 
     request(app)
       .post(`${namespace}/users`)
-      .send({ email, password, firstName, lastName })
+      .send({
+        data: { attributes }
+      })
       .expect(400)
       .end(done)
   })
 
   it('should return validation error if password is invalid', (done) => {
-    let email = 'test@test@gmail.com',
-        password = '123',
-        firstName = 'Julian',
-        lastName = users[0]['last-name']
+    let attributes = _.clone(sampleAttributes)
+    attributes.password = '123'
 
     request(app)
       .post(`${namespace}/users`)
-      .send({ email, password, firstName, lastName })
+      .send({
+        data: { attributes }
+      })
       .expect(400)
       .end(done)
   })
 
   it('should return validation error if firstName is invalid', (done) => {
-    let email = 'test@test@gmail.com',
-        password = '123123',
-        firstName = '',
-        lastName = users[0]['last-name']
+    let attributes = _.clone(sampleAttributes)
+    attributes['firstName'] = ''
 
     request(app)
       .post(`${namespace}/users`)
-      .send({ email, password, firstName, lastName })
+      .send({
+        data: { attributes }
+      })
       .expect(400)
       .end(done)
   })
 
   it('should return validation error if lastName is invalid', (done) => {
-    let email = 'test@test@gmail.com',
-        password = '123123',
-        firstName = 'Julian',
-        lastName = ''
+    let attributes = _.clone(sampleAttributes)
+
+    attributes['last-name'] = ''
 
     request(app)
       .post(`${namespace}/users`)
-      .send({ email, password, firstName, lastName })
+      .send({ data: { attributes } })
       .expect(400)
       .end(done)
   })
 
   it('should not create user if email in use', (done) => {
-    let email = users[0].email,
-        password = '123123',
-        firstName = 'Julian',
-        lastName = users[0]['last-name']
+    let attributes = _.clone(sampleAttributes)
+    attributes.email = users[0].email
 
     request(app)
       .post(`${namespace}/users`)
-      .send({ email, password, firstName, lastName })
+      .send({ data: { attributes } })
       .expect(400)
       .end(done)
   })
 })
 
-
 describe('PATCH /users/:id', () => {
-    it('should update the user', (done) => {
-      let id = users[0]._id.toHexString(),
-          firstName = "Sammy"
+  it('should update the user', (done) => {
+    let id = users[0]._id.toHexString()
+    let attributes = _.clone(sampleAttributes)
+    attributes['first-name'] = "Sammy"
 
-      request(app)
-        .patch(`${namespace}/users/${id}`)
-        .set('content-type', 'application/vnd.api+json')
-        .set('x-auth', users[0].tokens[0].token)
-        .send({
-          data: {
-            attributes: {
-              "first-name": firstName
-            }
-          }
-        })
-        .expect(200)
-        .expect((res) => {
-          const {
-            data,
-            data: { attributes }
-          } = res.body
+    request(app)
+      .patch(`${namespace}/users/${id}`)
+      .set('content-type', 'application/vnd.api+json')
+      .set('x-auth', users[0].tokens[0].token)
+      .send({ data: { attributes } })
+      .expect(200)
+      .expect((res) => {
+        const {
+          data
+        } = res.body
 
-          expect(data.id).toBe(id)
-          expect(attributes['first-name']).toBe(firstName)
-        })
-        .end(done)
-    })
+        expect(data.id).toBe(id)
+        expect(data.attributes['first-name']).toBe(attributes['first-name'])
+      })
+      .end(done)
+  })
 })
-
 
 describe('POST /users/login', () => {
   it('should login user and return auth token', (done) => {
+    let attributes = sampleAttributes
+    attributes.email = users[1].email
+    attributes.password = users[1].password
+
     request(app)
       .post(`${namespace}/users/login`)
+      .set('content-type', 'application/vnd.api+json')
       .send({
-        email: users[1].email,
-        password: users[1].password
+        data: { attributes }
       })
       .expect(200)
       .expect((res) => {
@@ -204,11 +186,14 @@ describe('POST /users/login', () => {
   })
 
   it('should reject invalid login', (done) => {
+    let attributes = sampleAttributes
+    attributes.email = users[1].email
+    attributes.password = users[1].password + '1'
+
     request(app)
       .post(`${namespace}/users/login`)
       .send({
-        email: users[1].email,
-        password: users[1].password + '1'
+        data: { attributes }
       })
       .expect(400)
       .expect((res) => {
