@@ -6,14 +6,14 @@ const mongoose = require('mongoose'),
       bcrypt = require('bcryptjs')
 
 const UserSchema = new Schema({
-  firstName: {
+  "first-name": {
     type: String,
     required: true,
     trim: true,
     minlength: 1,
     maxlength: 47,
   },
-  lastName: {
+  "last-name": {
     type: String,
     required: true,
     trim: true,
@@ -53,7 +53,7 @@ UserSchema.statics.type = function() {
 }
 
 UserSchema.statics.attributes = function() {
-  return ['email', 'firstName', 'lastName']
+  return ['email', 'first-name', 'last-name']
 }
 
 UserSchema.methods.toJSON = function() {

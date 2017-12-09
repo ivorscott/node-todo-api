@@ -41,14 +41,21 @@ describe('GET /users/:id', () => {
 
 describe('POST /users', () => {
   it('should create a user', (done) => {
-    let email = 'test@test.com',
-        password = '123123',
-        firstName = 'Julian',
-        lastName = users[0].lastName
+    let attributes = {
+      email: 'test@test.com',
+      password: '123123',
+      firstName: 'Julian',
+      lastName: users[0]['last-name']
+    }
 
     request(app)
       .post(`${namespace}/users`)
-      .send({email, password, firstName, lastName})
+      .set('content-type', 'application/vnd.api+json')
+      .send({
+        data: {
+          attributes
+        }
+      })
       .expect(200)
       .expect((res) => {
         const {
@@ -77,7 +84,7 @@ describe('POST /users', () => {
     let email = 'test',
         password = '123123',
         firstName = 'Julian',
-        lastName = users[0].lastName
+        lastName = users[0]['last-name']
 
     request(app)
       .post(`${namespace}/users`)
@@ -90,7 +97,7 @@ describe('POST /users', () => {
     let email = 'test@test@gmail.com',
         password = '123',
         firstName = 'Julian',
-        lastName = users[0].lastName
+        lastName = users[0]['last-name']
 
     request(app)
       .post(`${namespace}/users`)
@@ -103,7 +110,7 @@ describe('POST /users', () => {
     let email = 'test@test@gmail.com',
         password = '123123',
         firstName = '',
-        lastName = users[0].lastName
+        lastName = users[0]['last-name']
 
     request(app)
       .post(`${namespace}/users`)
@@ -129,7 +136,7 @@ describe('POST /users', () => {
     let email = users[0].email,
         password = '123123',
         firstName = 'Julian',
-        lastName = users[0].lastName
+        lastName = users[0]['last-name']
 
     request(app)
       .post(`${namespace}/users`)
@@ -143,12 +150,19 @@ describe('POST /users', () => {
 describe('PATCH /users/:id', () => {
     it('should update the user', (done) => {
       let id = users[0]._id.toHexString(),
-          firstName= "Sammy"
+          firstName = "Sammy"
 
       request(app)
         .patch(`${namespace}/users/${id}`)
+        .set('content-type', 'application/vnd.api+json')
         .set('x-auth', users[0].tokens[0].token)
-        .send({firstName})
+        .send({
+          data: {
+            attributes: {
+              "first-name": firstName
+            }
+          }
+        })
         .expect(200)
         .expect((res) => {
           const {

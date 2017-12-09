@@ -4,7 +4,7 @@ const _ = require('lodash'),
       { Todo } = require('./../models/todos.model')
 
 module.exports.todosAddOne = (req, res, next) => {
-  let text = req.data.text
+  let { text } = req.data
   let todo = new Todo({
     text,
     creator: req.user._id

@@ -4,11 +4,11 @@ const _ = require('lodash'),
       { User } = require('./../models/users.model')
 
 module.exports.usersLogin = (req, res) => {
-  let body = _.pick(req.body, ['email','password'])
+  let { email, password } = _.pick(req.data, ['email','password'])
 
-  User.findByCredentials(body.email, body.password).then((user) => {
+  User.findByCredentials(email, password).then((user) => {
 
-    let json = new JSONAPISerializer('users', {
+    let json = new JSONAPISerializer(User.type(), {
       attributes: User.attributes()
     }).serialize(user);
 
@@ -31,23 +31,21 @@ module.exports.usersRemoveToken = (req, res) => {
   .catch((e) => res.status(400).send(e))
 }
 
-module.exports.usersUpdateOne = (req, res) => {
+module.exports.usersUpdateOne = (req, res, next) => {
   let id = req.params.id,
-  body = _.pick(req.body, ['firstName', 'lastName', 'email'])
+      body = _.pick(req.data, ['first-name', 'last-name', 'email'])
 
   if(!ObjectID.isValid(id)) return res.status(404).send()
   if(req.user._id.toHexString() !== id) return res.status(400).send()
 
   User.findOneAndUpdate({
     _id: id,
-  }, {$set: body}, {new: true}).then((user) => {
+  }, {$set: body }, {new: true}).then((user) => {
     if(!user) return res.status(404).send()
-
-    let json = new JSONAPISerializer('users', {
-      attributes: User.attributes()
-    }).serialize(user);
-
-    res.send(json)
+    req.type = User.type()
+    req.attributes = User.attributes()
+    req.data = user
+    next()
   })
   .catch((e) => res.status(400).send(e))
 }
@@ -69,14 +67,15 @@ module.exports.usersGetOne = (req, res) => {
 }
 
 module.exports.usersAddOne = (req, res) => {
-  let body = _.pick(req.body, ['email','password','firstName','lastName'])
-  let user = new User(body)
-  user.generateAuthToken().then((token) => {
-    let json = new JSONAPISerializer('users', {
+  let body = _.pick(req.data, ['email','password','first-name','last-name']),
+      user = new User(body)
+
+  user.generateAuthToken()
+  .then((token) => {
+    let json = new JSONAPISerializer( User.type(), {
       attributes: User.attributes()
     }).serialize(user);
     res.header('x-auth', token).send(json)
   })
   .catch((e) => res.status(400).send(e))
-
 }

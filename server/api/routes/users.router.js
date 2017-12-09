@@ -1,21 +1,23 @@
 const express = require('express'),
       router = express.Router(),
       ctrlUsers = require('./../controllers/users.controller'),
-      { authenticate } = require('./../middleware/authenticate')
+      { authenticate } = require('./../middleware/authenticate'),
+      { deserialize } = require('./../middleware/deserialize'),
+      { serialize } = require('./../middleware/serialize')
 
 router
   .route('')
-  .post(ctrlUsers.usersAddOne)
+  .post(deserialize, ctrlUsers.usersAddOne)
 
 router
   .route('/login')
-  .post(ctrlUsers.usersLogin)
+  .post(deserialize, ctrlUsers.usersLogin)
 
 router
   .route('/:id')
   .all(authenticate)
   .get(ctrlUsers.usersGetOne)
-  .patch(ctrlUsers.usersUpdateOne)
+  .patch(deserialize, ctrlUsers.usersUpdateOne, serialize)
 
 router
   .route('/:id/token')

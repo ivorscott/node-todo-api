@@ -7,7 +7,7 @@ let deserialize = (req, res, next) => {
 
   if (!payload) {
     return res.status(400).send({
-      error: `expected a payload in jsonapi format ${helpLink}`
+      error: `expected a payload in jsonapi format, with Content-Type: application/vnd.api+json ${helpLink}`
     })
   }
 
