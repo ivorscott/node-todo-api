@@ -16,7 +16,7 @@ module.exports.usersLogin = (req, res) => {
       res.header('x-auth', token).send(json)
     })
   })
-  .catch((e) => res.status(400).send(e))
+  .catch((e) => res.status(401).send({ error: 'Attempted to log into non-existing account or with wrong credentials. Review your email and password.'}))
 }
 
 module.exports.usersRemoveToken = (req, res) => {
@@ -36,7 +36,7 @@ module.exports.usersUpdateOne = (req, res, next) => {
       body = _.pick(req.data, ['first-name', 'last-name', 'email'])
 
   if(!ObjectID.isValid(id)) return res.status(404).send()
-  if(req.user._id.toHexString() !== id) return res.status(400).send()
+  if(req.user._id.toHexString() !== id) return res.status(401).send()
 
   User.findOneAndUpdate({
     _id: id,
