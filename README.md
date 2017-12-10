@@ -4,7 +4,7 @@
 This api serializes & deserializes jsonapi payloads and is designed to work with [ember-todo-app](https://github.com/ivorscott/ember-todo-app).
 
 
-## Usage
+## Configuration
 
 App requires [MongoDB](https://www.mongodb.com) to be install locally and [nodemon](https://github.com/remy/nodemon) for a better development experience. Addtionally [Postman](https://www.getpostman.com) and [Robo3T](https://robomongo.org/) (previously RoboMongo) are essential tools I used throught the development.
 
@@ -28,6 +28,8 @@ Copy and paste this example config file. Then change the `JWT_SECRET` strings fo
   }
 }
 ```
+
+### Create a User
 Create a user or two in Postman.
 
 `POST`
@@ -56,6 +58,7 @@ Send raw text to http://localhost:4000/api/v1/users
 
  With this new user you can now login to  [ember-todo-app](https://github.com/ivorscott/ember-todo-app). Run this project against node-todo-api.
 
+#### Usage
 ```javascript
 npm install -g nodemon
 npm install
