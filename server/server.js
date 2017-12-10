@@ -33,7 +33,7 @@ if(!module.parent) {
     ==============================================================\n
     ${name.green} started up in a ${environment.green} environment\n
     ==============================================================\n
-    ${host}:${port}/${namespace} (ready for clients)
+    ${host}:${port}${namespace} (ready for clients)
     \n`)
   })
 }
