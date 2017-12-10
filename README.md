@@ -27,8 +27,34 @@ Copy and paste this example config file. Then change the `JWT_SECRET` strings fo
     "JWT_SECRET": "Top-Secret-Dont-Tell-Anyone"
   }
 }
-
 ```
+Create a user or two in Postman.
+
+`POST`
+
+Set Header
+  `Content-Type: application/vnd.api+json`
+
+Send raw text to http://localhost:4000/api/v1/users
+
+```json
+{
+  "data": {
+    "attributes": {
+      "firstName": "Rob",
+      "lastName": "Smith",
+      "email":"test@test.com",
+      "password":"test123"
+    }
+  }
+}
+```
+
+**Please Note :**
+
+ `POST /users` and `POST /users/login` endpoints are the only endpoints that return an `x-auth` authentication token which can be found in the response headers after the request.
+
+ With this new user you can now login to  [ember-todo-app](https://github.com/ivorscott/ember-todo-app). Run this project against node-todo-api.
 
 ```javascript
 npm install -g nodemon
