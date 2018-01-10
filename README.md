@@ -6,7 +6,7 @@ This api serializes & deserializes [jsonapi](http://jsonapi.org/) payloads and i
 
 ## Configuration
 
-App requires [MongoDB](https://www.mongodb.com) to be install locally and [nodemon](https://github.com/remy/nodemon) for a better development experience. Addtionally [Postman](https://www.getpostman.com) and [Robo3T](https://robomongo.org/) (previously RoboMongo) are essential tools I used throughout the development.
+The api requires [MongoDB](https://www.mongodb.com) to be install locally and [nodemon](https://github.com/remy/nodemon) for a better development experience. Addtionally [Postman](https://www.getpostman.com) and [Robo3T](https://robomongo.org/) (previously RoboMongo) are essential tools I used throughout the development.
 
 Copy and paste this example config file. Then change the `JWT_SECRET` strings for both test and development.
 
