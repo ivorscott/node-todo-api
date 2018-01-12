@@ -1,7 +1,7 @@
 # node-todo-api
 
 [nodo-todo-api](https://github.com/ivorscott/node-todo-api) is a NodeJS Express API that utilizes MongoDB & the Mocha testing framework.
-This api serializes & deserializes [jsonapi](http://jsonapi.org/) payloads and is designed to work with [ember-todo-app](https://github.com/ivorscott/ember-todo-app).
+This api serializes & deserializes [jsonapi](http://jsonapi.org) payloads and is designed to work with [ember-todo-app](https://github.com/ivorscott/ember-todo-app).
 
 
 ## Configuration
