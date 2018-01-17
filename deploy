@@ -1,0 +1,8 @@
+-#!/bin/sh      
+ssh ivor@staging.devpie.io <<EOF        
+ cd /node-todo-api  
+ git pull       
+ npm install --production       
+ pm2 restart all
+ exit       
+EOF
