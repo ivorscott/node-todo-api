@@ -1,0 +1,14 @@
+{
+    "test": {
+          "MONGODB_URI": "mongodb://localhost:27017/TodoTestApi",
+              "HOST": "http://localhost",
+                  "PORT": 3000,
+                      "JWT_SECRET": "Some-Secret-Dont-Tell-Anyone"
+                        },
+                          "development": {
+                                "MONGODB_URI": "mongodb://localhost:27017/TodoApi",
+                                    "HOST": "http://localhost",
+                                        "PORT": 4000,
+                                            "JWT_SECRET": "Top-Secret-Dont-Tell-Anyone"
+                                              }
+}
