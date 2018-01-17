@@ -3,6 +3,6 @@ ssh ivor@staging.devpie.io <<EOF
  cd node-todo-api  
  git pull       
  npm install --production       
- pm2 server/server.js
+ pm2 start server/server.js
  exit       
 EOF
